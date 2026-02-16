@@ -1,0 +1,239 @@
+﻿@* @model CoursesApplication.Domain.DomainModels.BookCopy
+@using System.Linq
+
+<h2>Book Copy Details</h2>
+
+@{
+    var borrowed = Model.CurrentBorrowing != null;
+    var logs = Model.BorrowingLogs ?? new List<CoursesApplication.Domain.DomainModels.BorrowingBookLog>();
+}
+
+<div class="mb-3">
+    <span class="badge @(borrowed ? "bg-danger" : "bg-success")">
+        @(borrowed ? "Borrowed" : "Available")
+    </span>
+</div>
+
+<dl class="row">
+    <dt class="col-sm-3">Book Name</dt>
+    <dd class="col-sm-9">@Model.Book.Title</dd>
+
+    <dt class="col-sm-3">Inventory Code</dt>
+    <dd class="col-sm-9">@Model.InventoryCode</dd>
+
+</dl>
+
+@if (borrowed)
+{
+    <div class="card mb-3">
+        <div class="card-header">Current Borrowing</div>
+        <div class="card-body">
+            <p class="mb-1">
+                <strong>Borrowed by:</strong>
+                @($"{Model.CurrentBorrowing!.User?.Name} {Model.CurrentBorrowing!.User?.Surname}")
+            </p>
+            <p class="mb-1">
+                <strong>Borrowed at:</strong>
+                @Model.CurrentBorrowing!.BorrowedAt.ToString("yyyy-MM-dd HH:mm")
+            </p>
+            <p class="mb-0">
+                <strong>Due date:</strong>
+                @(Model.CurrentBorrowing!.DueDate?.ToString("yyyy-MM-dd") ?? "—")
+            </p>
+        </div>
+        <div class="card-footer">
+            <form asp-controller="BookBorrowing"
+                  asp-action="Delete"
+                  asp-route-bookCopyId="@Model.Id"
+                  method="post"
+                  class="d-inline">
+                <button type="submit" class="btn btn-warning">Free</button>
+            </form>
+        </div>
+    </div>
+}
+else
+{
+    <a asp-controller="BookBorrowing"
+       asp-action="Create"
+       asp-route-bookCopyId="@Model.Id"
+       class="btn btn-success mb-3">Book</a>
+}
+
+<div class="mb-3">
+    @if (Model.CurrentBorrowing != null)
+    {
+        <a asp-controller="BookCopy"
+           asp-action="Edit"
+           asp-route-id="@Model.Id"
+           class="btn btn-primary">
+            Edit BookCopy
+        </a>
+    }
+
+    <form asp-controller="BookCopy"
+          asp-action="Delete"
+          asp-route-id="@Model.Id"
+          method="post"
+          class="d-inline"
+          onsubmit="return confirm('Delete this copy? This may remove related logs/borrowings.');">
+        <button type="submit" class="btn btn-danger">Remove BookCopy</button>
+    </form>
+
+    <a asp-controller="Books" asp-action="Details" asp-route-id="@Model.BookId" class="btn btn-secondary ms-2">Back to Book</a>
+</div>
+
+<h4>Borrowing Logs</h4>
+@if (!logs.Any())
+{
+    <p>No logs for this copy.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Log Id</th>
+                <th>User</th>
+                <th>Borrowed At</th>
+                <th>Due Date</th>
+                <th>Returned At</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var log in logs)
+            {
+                <tr>
+                    <td>@log.Id</td>
+                    <td>@($"{log.User?.Name} {log.User?.Surname}")</td>
+                    <td>@(log.BorrowedAt.ToString("yyyy-MM-dd HH:mm"))</td>
+                    <td>@(log.ReturnedAt.ToString("yyyy-MM-dd HH:mm"))</td>
+                    <td>@(string.IsNullOrWhiteSpace(log.Notes) ? "—" : log.Notes)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+} *@
+
+
+@model CoursesApplication.Domain.DomainModels.BookCopy
+@using System.Linq
+@{
+    ViewData["Title"] = "Book Copy Details";
+    var borrowed = Model.CurrentBorrowing != null;
+    var logs = Model.BorrowingLogs ?? new List<CoursesApplication.Domain.DomainModels.BorrowingBookLog>();
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="BookCopy" asp-action="Index">Book Copies</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Details</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Book Copy</h5>
+            <span class="badge @(borrowed ? "bg-danger" : "bg-success")">
+                @(borrowed ? "Borrowed" : "Available")
+            </span>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Book</dt>
+                <dd class="col-sm-9">
+                    @Model.Book?.Title
+                    <span class="text-muted">(<code>@Model.BookId</code>)</span>
+                </dd>
+
+                <dt class="col-sm-3">Inventory Code</dt>
+                <dd class="col-sm-9">@Model.InventoryCode</dd>
+            </dl>
+        </div>
+        <div class="card-footer d-flex flex-wrap gap-2">
+            @if (!borrowed)
+            {
+                <a asp-controller="BookBorrowing"
+                   asp-action="Create"
+                   asp-route-bookCopyId="@Model.Id"
+                   class="btn btn-success">Book</a>
+            }
+            else
+            {
+                <div class="me-auto">
+                    <strong>Borrowed by:</strong>
+                    @($"{Model.CurrentBorrowing!.User?.Name} {Model.CurrentBorrowing!.User?.Surname}") |
+                    <strong>Borrowed at:</strong> @Model.CurrentBorrowing!.BorrowedAt.ToString("yyyy-MM-dd HH:mm") |
+                    <strong>Due date:</strong> @(Model.CurrentBorrowing!.DueDate?.ToString("yyyy-MM-dd") ?? "—")
+                </div>
+                <form asp-controller="BookBorrowing"
+                      asp-action="Delete"
+                      asp-route-bookCopyId="@Model.Id"
+                      method="post"
+                      class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-warning">Free</button>
+                </form>
+            }
+
+            <a asp-controller="BookCopy"
+               asp-action="Edit"
+               asp-route-id="@Model.Id"
+               class="btn btn-primary">Edit Copy</a>
+
+            <form asp-controller="BookCopy"
+                  asp-action="Delete"
+                  asp-route-id="@Model.Id"
+                  method="post"
+                  class="d-inline"
+                  onsubmit="return confirm('Delete this copy? This may remove related logs/borrowings.');">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-danger">Remove Copy</button>
+            </form>
+
+            <a asp-controller="Books" asp-action="Details" asp-route-id="@Model.BookId" class="btn btn-outline-secondary">Back to Book</a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h6 class="mb-0">Borrowing Logs (@logs.Count)</h6>
+        </div>
+        <div class="card-body">
+            @if (!logs.Any())
+            {
+                <p class="text-muted mb-0">No logs for this copy.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>User</th>
+                                <th>Borrowed At</th>
+                                <th>Due Date</th>
+                                <th>Returned At</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var log in logs)
+                            {
+                                <tr>
+                                    <td>@($"{log.User?.Name} {log.User?.Surname}")</td>
+                                    <td>@log.BorrowedAt:yyyy-MM-dd HH:mm</td>
+                                    <td>@(log.DueDate?.ToString("yyyy-MM-dd") ?? "—")</td>
+                                    <td>@(log.ReturnedAt.ToString("yyyy-MM-dd HH:mm") ?? "—")</td>
+                                    <td>@(string.IsNullOrWhiteSpace(log.Notes) ? "—" : log.Notes)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>

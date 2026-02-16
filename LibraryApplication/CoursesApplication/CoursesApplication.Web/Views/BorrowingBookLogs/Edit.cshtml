@@ -1,0 +1,123 @@
+﻿@* @model CoursesApplication.Domain.DomainModels.BorrowingBookLog
+
+<h2>Edit Borrowing Log</h2>
+
+<form asp-action="Edit" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="BookCopyId" class="form-label"></label>
+        <input asp-for="BookCopyId" class="form-control" />
+        <span asp-validation-for="BookCopyId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="UserId" class="form-label"></label>
+        <input asp-for="UserId" class="form-control" />
+        <span asp-validation-for="UserId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="BorrowedAt" class="form-label"></label>
+        <input asp-for="BorrowedAt" class="form-control" type="datetime-local" />
+        <span asp-validation-for="BorrowedAt" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ReturnedAt" class="form-label"></label>
+        <input asp-for="ReturnedAt" class="form-control" type="datetime-local" />
+        <span asp-validation-for="ReturnedAt" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Notes" class="form-label"></label>
+        <textarea asp-for="Notes" class="form-control"></textarea>
+        <span asp-validation-for="Notes" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+} *@
+
+@model CoursesApplication.Domain.DomainModels.BorrowingBookLog
+@{
+    ViewData["Title"] = "Edit Borrowing Log";
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="BorrowingBookLogs" asp-action="Index">Borrowing Logs</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Edit Borrowing Log</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" asp-for="Id" />
+                        <div class="alert alert-danger d-none" role="alert" data-valmsg-summary="true"><ul></ul></div>
+
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label asp-for="BookCopyId" class="form-label">Book Copy</label>
+                                <input asp-for="BookCopyId" class="form-control" />
+                                <span asp-validation-for="BookCopyId" class="text-danger small"></span>
+                            </div>
+                            <div class="col-sm-6">
+                                <label asp-for="UserId" class="form-label">User</label>
+                                <input asp-for="UserId" class="form-control" />
+                                <span asp-validation-for="UserId" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-0">
+                            <div class="col-sm-6">
+                                <label asp-for="BorrowedAt" class="form-label">Borrowed At</label>
+                                <input asp-for="BorrowedAt" class="form-control" type="datetime-local" />
+                                <span asp-validation-for="BorrowedAt" class="text-danger small"></span>
+                            </div>
+                            <div class="col-sm-6">
+                                <label asp-for="ReturnedAt" class="form-label">Returned At</label>
+                                <input asp-for="ReturnedAt" class="form-control" type="datetime-local" />
+                                <span asp-validation-for="ReturnedAt" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Notes" class="form-label">Notes</label>
+                            <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Notes" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-muted small">
+                    Fields marked with <span class="text-danger">*</span> are required.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

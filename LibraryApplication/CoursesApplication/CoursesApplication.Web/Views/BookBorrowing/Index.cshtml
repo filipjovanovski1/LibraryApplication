@@ -1,0 +1,91 @@
+﻿@* @model IEnumerable<CoursesApplication.Domain.DomainModels.BookBorrowing>
+
+<h2>Borrowings</h2>
+<p><a asp-action="Create" class="btn btn-primary">Create New</a></p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>UserId</th>
+            <th>BookCopyId</th>
+            <th>BorrowedAt</th>
+            <th>DueDate</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var b in Model)
+        {
+            <tr>
+                <td>@b.UserId</td>
+                <td>@b.BookCopyId</td>
+                <td>@b.BorrowedAt</td>
+                <td>@b.DueDate</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@b.Id">Details</a> |
+                    <a asp-action="Edit" asp-route-id="@b.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@b.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table> *@
+
+
+@model IEnumerable<CoursesApplication.Domain.DomainModels.BookBorrowing>
+@{
+    ViewData["Title"] = "Borrowings";
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Borrowings</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Borrowings</h2>
+        <a asp-action="Create" class="btn btn-primary">Create New</a>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>User</th>
+                        <th>Book Copy</th>
+                        <th>Borrowed At</th>
+                        <th>Due Date</th>
+                        <th class="text-end" style="width: 220px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var b in Model)
+                    {
+                        <tr>
+                            <td>@b.UserId</td>
+                            <td><code>@b.BookCopyId</code></td>
+                            <td>@b.BorrowedAt:yyyy-MM-dd</td>
+                            <td>@b.DueDate:yyyy-MM-dd</td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@b.Id" class="btn btn-sm btn-outline-info me-1">Details</a>
+                                <a asp-action="Edit" asp-route-id="@b.Id" class="btn btn-sm btn-outline-warning me-1">Edit</a>
+                                <a asp-action="Delete" asp-route-id="@b.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info" role="alert">
+            No borrowings found. <a asp-action="Create" class="alert-link">Create one now</a>.
+        </div>
+    }
+</div>

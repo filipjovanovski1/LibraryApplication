@@ -1,0 +1,330 @@
+﻿@* @model CoursesApplication.Domain.DomainModels.Book
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Create Book";
+
+    // authors coming from controller
+    var authors = (IEnumerable<SelectListItem>)ViewBag.Authors;
+    var selected = (IEnumerable<Guid>)ViewBag.SelectedAuthorIds ?? Enumerable.Empty<Guid>();
+
+    // categories list (works whether your enum is nullable or not)
+    var categories = Enum.GetValues(typeof(CoursesApplication.Domain.DomainModels.BookCategory))
+                         .Cast<CoursesApplication.Domain.DomainModels.BookCategory>()
+                         .ToList();
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <!-- Title -->
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    @{
+        var authors = (IEnumerable<SelectListItem>)ViewBag.Authors ?? Enumerable.Empty<SelectListItem>();
+        var selected = (IEnumerable<Guid>)ViewBag.SelectedAuthorIds ?? Enumerable.Empty<Guid>();
+    }
+    <div class="mb-3">
+        <label class="form-label">Authors</label>
+        <div class="border rounded p-2" style="max-height:300px; overflow:auto;">
+            @foreach (var it in authors)
+            {
+                var isChecked = Guid.TryParse(it.Value, out var id) && selected.Contains(id);
+                <div class="form-check">
+                    <input class="form-check-input"
+                           type="checkbox"
+                           id="author_@it.Value"
+                           name="selectedAuthorIds"
+                           value="@it.Value"
+                           @(isChecked ? "checked" : null) />
+                    <label class="form-check-label" for="author_@it.Value">@it.Text</label>
+                </div>
+            }
+        </div>
+        <span class="text-danger" data-valmsg-for="selectedAuthorIds"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Category" class="form-label"></label>
+        <select asp-for="Category" class="form-select" asp-items="Html.GetEnumSelectList<CoursesApplication.Domain.DomainModels.BookCategory>()">
+            <option value="" selected disabled>-- Select category --</option>
+        </select>
+        <span asp-validation-for="Category" class="text-danger"></span>
+    </div>
+
+    <!-- Number of Copies -->
+    <div class="mb-3">
+        <label asp-for="NumberCopies" class="form-label"></label>
+        <input asp-for="NumberCopies" class="form-control" type="number" min="0" />
+        <span asp-validation-for="NumberCopies" class="text-danger"></span>
+    </div>
+
+
+    <button type="submit" class="btn btn-primary">Create</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+
+    @Html.AntiForgeryToken()
+</form>
+
+<!-- Add Author Modal -->
+<div class="modal fade" id="addAuthorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="quickAddAuthorForm" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Author</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input name="name" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Surname</label>
+                    <input name="surname" class="form-control" required />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="submit">Save Author</button>
+            </div>
+            @Html.AntiForgeryToken()
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        (function () {
+            const labelEl = document.getElementById('authorsDropdownLabel');
+            const badgeEl = document.getElementById('authorsCountBadge');
+
+            function allChecks() { return Array.from(document.querySelectorAll('#authorsList .author-check')); }
+            function visibleRows() { return Array.from(document.querySelectorAll('#authorsList label')).filter(l => l.style.display !== 'none'); }
+            function checkedChecks() { return Array.from(document.querySelectorAll('#authorsList .author-check:checked')); }
+
+            function updateLabelAndBadge() {
+                const sel = checkedChecks();
+                if (sel.length === 0) {
+                    labelEl.textContent = 'Select authors…';
+                    badgeEl.style.display = 'none';
+                    return;
+                }
+                const names = sel.slice(0, 3).map(c => c.closest('label').querySelector('span').textContent.trim());
+                labelEl.textContent = names.join(', ') + (sel.length > 3 ? ` +${sel.length - 3}` : '');
+                badgeEl.textContent = sel.length;
+                badgeEl.style.display = '';
+            }
+
+            // initial + change listeners
+            allChecks().forEach(c => c.addEventListener('change', updateLabelAndBadge));
+            updateLabelAndBadge();
+
+            // search filter
+            $('#authorSearch').on('input', function () {
+                const q = this.value.toLowerCase();
+                $('#authorsList label').each(function () {
+                    $(this).toggle($(this).text().toLowerCase().includes(q));
+                });
+            });
+
+            // bulk actions
+            $('#selectAllAuthors').on('click', function () {
+                allChecks().forEach(c => c.checked = true);
+                updateLabelAndBadge();
+            });
+
+            $('#selectVisibleAuthors').on('click', function () {
+                visibleRows().forEach(lbl => { lbl.querySelector('.author-check').checked = true; });
+                updateLabelAndBadge();
+            });
+
+            $('#invertVisibleAuthors').on('click', function () {
+                visibleRows().forEach(lbl => {
+                    const c = lbl.querySelector('.author-check');
+                    c.checked = !c.checked;
+                });
+                updateLabelAndBadge();
+            });
+
+            $('#clearAuthors').on('click', function () {
+                allChecks().forEach(c => c.checked = false);
+                updateLabelAndBadge();
+            });
+
+            // quick add author
+            $('#quickAddAuthorForm').on('submit', function (e) {
+                e.preventDefault();
+                const $f = $(this);
+                $.post('/Authors/QuickCreate', $f.serialize())
+                 .done(function (res) {
+                     const $row = $(`
+                       <label class="dropdown-item d-flex align-items-center gap-2">
+                           <input type="checkbox" class="form-check-input author-check" name="selectedAuthorIds" value="${res.id}" checked />
+                           <span>${res.text}</span>
+                       </label>`);
+                     $('#authorsList').prepend($row);
+                     $row.find('.author-check').on('change', updateLabelAndBadge);
+                     updateLabelAndBadge();
+                     bootstrap.Modal.getInstance(document.getElementById('addAuthorModal')).hide();
+                     $f[0].reset();
+                 })
+                 .fail(function (xhr) { alert(xhr.responseText || 'Failed to add author.'); });
+            });
+        })();
+    </script>
+} *@
+@model CoursesApplication.Domain.DomainModels.Book
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Create Book";
+
+    var authors = (IEnumerable<SelectListItem>)ViewBag.Authors ?? Enumerable.Empty<SelectListItem>();
+    var selected = (IEnumerable<Guid>)ViewBag.SelectedAuthorIds ?? Enumerable.Empty<Guid>();
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Books" asp-action="Index">Books</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Create</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Create Book</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <div class="alert alert-danger d-none" role="alert" data-valmsg-summary="true"><ul></ul></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label">Title <span class="text-danger">*</span></label>
+                            <input asp-for="Title" class="form-control" placeholder="e.g., Clean Code" autofocus />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <label class="form-label mb-0">Authors <span class="text-danger">*</span></label>
+                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addAuthorModal">Add Author</button>
+                            </div>
+
+                            <input type="text" id="authorSearch" class="form-control form-control-sm mb-2" placeholder="Search authors..." />
+
+                            <div id="authorsList" class="border rounded p-2" style="max-height:300px; overflow:auto;">
+                                @foreach (var it in authors)
+                                {
+                                    var isChecked = Guid.TryParse(it.Value, out var id) && selected.Contains(id);
+                                    <div class="form-check">
+                                        <input class="form-check-input author-check" type="checkbox"
+                                               id="author_@it.Value"
+                                               name="selectedAuthorIds" value="@it.Value"
+                                               @(isChecked ? "checked" : null) />
+                                        <label class="form-check-label" for="author_@it.Value"><span>@it.Text</span></label>
+                                    </div>
+                                }
+                            </div>
+                            <span class="text-danger small" data-valmsg-for="selectedAuthorIds"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Category" class="form-label">Category <span class="text-danger">*</span></label>
+                            <select asp-for="Category" class="form-select" asp-items="Html.GetEnumSelectList<CoursesApplication.Domain.DomainModels.BookCategory>()">
+                                <option value="" selected disabled>-- Select category --</option>
+                            </select>
+                            <span asp-validation-for="Category" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="NumberCopies" class="form-label">Number of Copies <span class="text-danger">*</span></label>
+                            <input asp-for="NumberCopies" class="form-control" type="number" min="0" />
+                            <span asp-validation-for="NumberCopies" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">Create</button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-muted small">
+                    Fields marked with <span class="text-danger">*</span> are required.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Author Modal -->
+<div class="modal fade" id="addAuthorModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <form id="quickAddAuthorForm" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Author</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @Html.AntiForgeryToken()
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input name="name" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Surname</label>
+                    <input name="surname" class="form-control" required />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="submit">Save Author</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        (function () {
+            // simple search filter
+            $('#authorSearch').on('input', function () {
+                const q = this.value.toLowerCase();
+                $('#authorsList .form-check').each(function () {
+                    $(this).toggle($(this).text().toLowerCase().includes(q));
+                });
+            });
+
+            // quick add author
+            $('#quickAddAuthorForm').on('submit', function (e) {
+                e.preventDefault();
+                const $f = $(this);
+                $.post('/Authors/QuickCreate', $f.serialize())
+                .done(function (res) {
+                    const $row = $(`
+                        <div class="form-check">
+                            <input class="form-check-input author-check" type="checkbox" id="author_${res.id}" name="selectedAuthorIds" value="${res.id}" checked />
+                            <label class="form-check-label" for="author_${res.id}"><span>${res.text}</span></label>
+                        </div>`);
+                    $('#authorsList').prepend($row);
+                    bootstrap.Modal.getInstance(document.getElementById('addAuthorModal')).hide();
+                    $f[0].reset();
+                })
+                .fail(function (xhr) { alert(xhr.responseText || 'Failed to add author.'); });
+            });
+        })();
+    </script>
+}

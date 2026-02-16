@@ -1,0 +1,68 @@
+﻿@* @model CoursesApplication.Domain.Identity.User
+
+@{
+    ViewData["Title"] = "Delete User";
+}
+
+<h2>Delete User</h2>
+<p class="text-danger">
+    This will permanently delete the user and all related records:
+    borrowings, borrowing logs, taken seat logs, and the taken seat (if any).
+</p>
+
+<dl class="row">
+    <dt class="col-sm-3">Id</dt>
+    <dd class="col-sm-9">@Model.Id</dd>
+
+    <dt class="col-sm-3">UserName</dt>
+    <dd class="col-sm-9">@Model.UserName</dd>
+
+    <dt class="col-sm-3">Email</dt>
+    <dd class="col-sm-9">@Model.Email</dd>
+
+    <dt class="col-sm-3">Name</dt>
+    <dd class="col-sm-9">@Model.Name</dd>
+
+    <dt class="col-sm-3">Surname</dt>
+    <dd class="col-sm-9">@Model.Surname</dd>
+</dl>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+</form> *@
+@model CoursesApplication.Domain.Identity.User
+@{
+    ViewData["Title"] = "Delete User";
+}
+
+<div class="container py-4">
+    <div class="alert alert-warning">
+        <h5 class="alert-heading">Delete User</h5>
+        <p class="mb-0">
+            This will permanently delete the user and all related records:
+            <strong>borrowings, borrowing logs, taken seat logs, and the taken seat (if any)</strong>.
+        </p>
+    </div>
+
+    <dl class="row">
+        <dt class="col-sm-3">UserName</dt>
+        <dd class="col-sm-9">@Model.UserName</dd>
+
+        <dt class="col-sm-3">Email</dt>
+        <dd class="col-sm-9">@Model.Email</dd>
+
+        <dt class="col-sm-3">Name</dt>
+        <dd class="col-sm-9">@Model.Name</dd>
+
+        <dt class="col-sm-3">Surname</dt>
+        <dd class="col-sm-9">@Model.Surname</dd>
+    </dl>
+
+    <form asp-action="Delete" method="post" class="mt-3">
+        <input type="hidden" asp-for="Id" />
+        <button type="submit" class="btn btn-danger">Delete</button>
+        <a asp-action="Index" class="btn btn-outline-secondary ms-2">Cancel</a>
+    </form>
+</div>

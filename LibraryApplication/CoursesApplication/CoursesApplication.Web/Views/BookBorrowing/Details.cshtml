@@ -1,0 +1,62 @@
+﻿@* @model CoursesApplication.Domain.DomainModels.BookBorrowing
+
+<h2>Borrowing Details</h2>
+<dl class="row">
+    <dt class="col-sm-2">UserId</dt>
+    <dd class="col-sm-10">@Model.UserId</dd>
+    <dt class="col-sm-2">BookCopyId</dt>
+    <dd class="col-sm-10">@Model.BookCopyId</dd>
+    <dt class="col-sm-2">BorrowedAt</dt>
+    <dd class="col-sm-10">@Model.BorrowedAt</dd>
+    <dt class="col-sm-2">DueDate</dt>
+    <dd class="col-sm-10">@Model.DueDate</dd>
+</dl>
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</p> *@
+
+
+@model CoursesApplication.Domain.DomainModels.BookBorrowing
+@{
+    ViewData["Title"] = "Borrowing Details";
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="BookBorrowings" asp-action="Index">Borrowings</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Details</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Borrowing Details</h5>
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-3">User</dt>
+                        <dd class="col-sm-9">@Model.UserId</dd>
+
+                        <dt class="col-sm-3">Book Copy</dt>
+                        <dd class="col-sm-9"><code>@Model.BookCopyId</code></dd>
+
+                        <dt class="col-sm-3">Borrowed At</dt>
+                        <dd class="col-sm-9">@Model.BorrowedAt:yyyy-MM-dd</dd>
+
+                        <dt class="col-sm-3">Due Date</dt>
+                        <dd class="col-sm-9">@Model.DueDate:yyyy-MM-dd</dd>
+                    </dl>
+                </div>
+                <div class="card-footer d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

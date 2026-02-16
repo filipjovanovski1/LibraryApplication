@@ -1,0 +1,53 @@
+﻿@model IEnumerable<CoursesApplication.Domain.Identity.User>
+@using Microsoft.AspNetCore.Identity
+@using CoursesApplication.Domain.Identity
+@inject UserManager<User> UserManager
+
+@{
+    ViewData["Title"] = "Users";
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Users</h2>
+        <a asp-action="Create" class="btn btn-success">+ Create New</a>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped align-middle shadow-sm">
+            <thead class="table-light">
+                <tr>
+                    <th>Name</th>
+                    <th>Surname</th>
+                    <th>Roles</th>
+                    <th style="width:220px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model)
+                {
+                    var roles = await UserManager.GetRolesAsync(u);
+                    <tr>
+                        <td>@u.Name</td>
+                        <td>@u.Surname</td>
+                        <td>
+                            @if (roles != null && roles.Count > 0)
+                            {
+                                @string.Join(", ", roles)
+                            }
+                            else
+                            {
+                                @:—
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@u.Id" class="btn btn-outline-secondary btn-sm">Details</a>
+                            <a asp-action="Edit" asp-route-id="@u.Id" class="btn btn-outline-primary btn-sm ms-1">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@u.Id" class="btn btn-outline-danger btn-sm ms-1">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

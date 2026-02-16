@@ -1,0 +1,36 @@
+﻿@* @model IEnumerable<CoursesApplication.Domain.DomainModels.Author>
+@{
+    ViewData["Title"] = "Authors";
+}
+<h2>Authors</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New Author</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(m => m.First().Name)</th>
+            <th>@Html.DisplayNameFor(m => m.First().Surname)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var author in Model)
+        {
+            <tr>
+                <td>@author.Name</td>
+                <td>@author.Surname</td>
+                <td class="text-end">
+                    <a asp-action="Details" asp-route-id="@author.Id"
+                       class="btn btn-info btn-sm">Details</a>
+                    <a asp-action="Edit" asp-route-id="@author.Id"
+                       class="btn btn-warning btn-sm">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@author.Id"
+                       class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table> *@

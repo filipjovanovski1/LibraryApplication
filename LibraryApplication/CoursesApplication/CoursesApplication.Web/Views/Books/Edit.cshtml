@@ -1,0 +1,127 @@
+﻿@* @model CoursesApplication.Domain.DomainModels.Book
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using CoursesApplication.Domain.DomainModels
+
+<h2>Edit Book</h2>
+
+<form asp-action="Edit" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <!-- Authors (multi-select) -->
+    <div class="mb-3">
+        <label class="form-label">Authors</label>
+        <select name="selectedAuthorIds"
+                class="form-select"
+                multiple
+                size="6"
+                asp-items="(IEnumerable<SelectListItem>)ViewBag.Authors">
+        </select>
+        <!-- Show model-state error added under key "Authors" -->
+        <span asp-validation-for="Authors" class="text-danger"></span>
+    </div>
+
+    
+
+    <div class="mb-3">
+        <label asp-for="Category" class="form-label"></label>
+        <select asp-for="Category"
+                class="form-select"
+                asp-items="Html.GetEnumSelectList<BookCategory>()">
+        </select>
+        <span asp-validation-for="Category" class="text-danger"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="NumberCopies" class="form-label"></label>
+        <input asp-for="NumberCopies" class="form-control" type="number" min="0" />
+        <span asp-validation-for="NumberCopies" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+} *@
+
+
+@model CoursesApplication.Domain.DomainModels.Book
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using CoursesApplication.Domain.DomainModels
+@{
+    ViewData["Title"] = "Edit Book";
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Books" asp-action="Index">Books</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">Edit Book</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit" method="post" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <input type="hidden" asp-for="Id" />
+                        <div class="alert alert-danger d-none" role="alert" data-valmsg-summary="true"><ul></ul></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Title" class="form-label">Title <span class="text-danger">*</span></label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Authors <span class="text-danger">*</span></label>
+                            <select name="selectedAuthorIds" class="form-select" multiple size="6"
+                                    asp-items="(IEnumerable<SelectListItem>)ViewBag.Authors">
+                            </select>
+                            <span asp-validation-for="Authors" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Category" class="form-label">Category <span class="text-danger">*</span></label>
+                            <select asp-for="Category" class="form-select" asp-items="Html.GetEnumSelectList<BookCategory>()"></select>
+                            <span asp-validation-for="Category" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="NumberCopies" class="form-label">Number of Copies <span class="text-danger">*</span></label>
+                            <input asp-for="NumberCopies" class="form-control" type="number" min="0" />
+                            <span asp-validation-for="NumberCopies" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-muted small">
+                    Fields marked with <span class="text-danger">*</span> are required.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,262 @@
+﻿@* @model CoursesApplication.Domain.DomainModels.Book
+@using System.Linq
+
+<h2>Book Details</h2>
+
+@{
+    var copies = Model.Copies ?? new List<CoursesApplication.Domain.DomainModels.BookCopy>();
+    var availableCount = copies.Count(c => c.CurrentBorrowing == null);
+    var authors = (Model.Authors != null && Model.Authors.Any())
+        ? string.Join(", ", Model.Authors.Select(a => $"{a.Name} {a.Surname}"))
+        : "—";
+}
+
+<dl class="row">
+    <dt class="col-sm-2">Title</dt>
+    <dd class="col-sm-10">@Model.Title</dd>
+
+ 
+
+    <dt class="col-sm-2">Category</dt>
+    <dd class="col-sm-10">@Model.Category</dd>
+
+    <dt class="col-sm-2">Number of copies</dt>
+    <dd class="col-sm-10">@Model.NumberCopies</dd>
+
+    <dt class="col-sm-2">Available</dt>
+    <dd class="col-sm-10">@availableCount</dd>
+
+    <dt class="col-sm-2">Authors</dt>
+    <dd class="col-sm-10">@authors</dd>
+</dl>
+
+<p class="mb-3">
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</p>
+
+<h4>Copies</h4>
+@if (!copies.Any())
+{
+    <p>No copies.</p>
+}
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Inventory Code</th>
+                <th>Status</th>
+                <th>Borrowed By</th>
+                <th>Borrowed At</th>
+                <th>Due Date</th>
+                
+                <th style="width: 240px;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var copy in copies)
+            {
+                var borrowed = copy.CurrentBorrowing != null;
+                <tr>
+                    <td>@copy.InventoryCode</td>
+                    <td>
+                        @if (borrowed)
+                        {
+                            <span class="badge bg-danger">Borrowed</span>
+                        }
+                        else
+                        {
+
+                            <span class="badge bg-success">Available</span>
+                        }
+                    </td>
+                    <td>
+                        @if (borrowed)
+                        {
+                            @($"{copy.CurrentBorrowing!.User?.Name} {copy.CurrentBorrowing!.User?.Surname}")
+                        }
+                        else
+                        {
+
+                            @("—")
+                        }
+                    </td>
+                    <td>@(borrowed? copy.CurrentBorrowing!.BorrowedAt.ToString("yyyy-MM-dd HH:mm") : "—")</td>
+                    <td>@(borrowed ? (copy.CurrentBorrowing!.DueDate?.ToString("yyyy-MM-dd") ?? "—") : "—")</td>
+                    
+                    <td>
+                        
+                        <a asp-controller="BookCopy"
+                           asp-action="Details"
+                           asp-route-id="@copy.Id"
+                           class="btn btn-outline-secondary btn-sm">
+                            View
+                        </a>
+
+                        @if (!borrowed)
+                        {
+                            
+                            <a asp-controller="BookBorrowing"
+                               asp-action="Create"
+                               asp-route-bookCopyId="@copy.Id"
+                               class="btn btn-outline-primary btn-sm ms-1">
+                                Book
+                            </a>
+                        }
+                        else
+                        {
+                            
+                            <form asp-controller="BookBorrowing"
+                                  asp-action="Delete"
+                                  asp-route-bookCopyId="@copy.Id"
+                                  method="post"
+                                  class="d-inline">
+                                <button type="submit" class="btn btn-outline-warning btn-sm ms-1">
+                                    Free
+                                </button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+
+<form asp-controller="BookCopy"
+      asp-action="CreateInline"
+      method="post"
+      class="d-inline">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="bookId" value="@Model.Id" />
+    <button type="submit" class="btn btn-success">
+        Add a new BookCopy
+    </button>
+</form>
+
+ *@
+
+
+@model CoursesApplication.Domain.DomainModels.Book
+@using System.Linq
+@{
+    ViewData["Title"] = "Book Details";
+    var copies = Model.Copies ?? new List<CoursesApplication.Domain.DomainModels.BookCopy>();
+    var availableCount = copies.Count(c => c.CurrentBorrowing == null);
+    var authors = (Model.Authors != null && Model.Authors.Any())
+        ? string.Join(", ", Model.Authors.Select(a => $"{a.Name} {a.Surname}"))
+        : "—";
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Books" asp-action="Index">Books</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Details</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Book Details</h5>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Title</dt>
+                <dd class="col-sm-9">@Model.Title</dd>
+
+                <dt class="col-sm-3">Category</dt>
+                <dd class="col-sm-9">@Model.Category</dd>
+
+                <dt class="col-sm-3">Number of copies</dt>
+                <dd class="col-sm-9">@Model.NumberCopies</dd>
+
+                <dt class="col-sm-3">Available</dt>
+                <dd class="col-sm-9">@availableCount</dd>
+
+                <dt class="col-sm-3">Authors</dt>
+                <dd class="col-sm-9">@authors</dd>
+            </dl>
+        </div>
+        <div class="card-footer d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+            <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h6 class="mb-0">Copies (@copies.Count)</h6>
+        </div>
+        <div class="card-body">
+            @if (!copies.Any())
+            {
+                <p class="text-muted mb-0">No copies.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Inventory Code</th>
+                                <th>Status</th>
+                                <th>Borrowed By</th>
+                                <th>Borrowed At</th>
+                                <th>Due Date</th>
+                                <th style="width: 260px;" class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var copy in copies)
+                            {
+                                var borrowed = copy.CurrentBorrowing != null;
+                                <tr>
+                                    <td>@copy.InventoryCode</td>
+                                    <td>
+                                        @if (borrowed)
+                                        {
+                                            <span class="badge bg-danger">Borrowed</span>
+                                        }
+                                        else
+                                        {
+
+                                            <span class="badge bg-success">Available</span>
+                                        }
+                                    </td>
+                                    <td>@(borrowed ? $"{copy.CurrentBorrowing!.User?.Name} {copy.CurrentBorrowing!.User?.Surname}" : "—")</td>
+                                    <td>@(borrowed? copy.CurrentBorrowing!.BorrowedAt.ToString("yyyy-MM-dd HH:mm") : "—")</td>
+                                    <td>@(borrowed ? (copy.CurrentBorrowing!.DueDate?.ToString("yyyy-MM-dd") ?? "—") : "—")</td>
+                                    <td class="text-end">
+                                        <a asp-controller="BookCopy" asp-action="Details" asp-route-id="@copy.Id" class="btn btn-sm btn-outline-secondary me-1">View</a>
+                                        @if (!borrowed)
+                                        {
+                                            <a asp-controller="BookBorrowing" asp-action="Create" asp-route-bookCopyId="@copy.Id" class="btn btn-sm btn-outline-primary me-1">Book</a>
+                                        }
+                                        else
+                                        {
+                                            <form asp-controller="BookBorrowing" asp-action="Delete" asp-route-bookCopyId="@copy.Id" method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-outline-warning me-1">Free</button>
+                                            </form>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+        <div class="card-footer">
+            <form asp-controller="BookCopy" asp-action="CreateInline" method="post" class="d-inline">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="bookId" value="@Model.Id" />
+                <button type="submit" class="btn btn-success">Add a new BookCopy</button>
+            </form>
+        </div>
+    </div>
+</div>

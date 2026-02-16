@@ -1,0 +1,39 @@
+.hero-section {
+    position: relative;
+    background-image: url('/images/library-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    min-height: 400px;
+    border-radius: 12px;
+    text-align: center;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* keep overlay inside radius */
+}
+
+    /* Dark overlay layer */
+    .hero-section::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5); /* darker background */
+        border-radius: 12px;
+        z-index: 0;
+    }
+
+    /* Ensure text stays above overlay */
+    .hero-section h1,
+    .hero-section h2 {
+        position: relative;
+        z-index: 1;
+        color: white; /* always bright */
+        text-shadow: 2px 2px 6px rgba(0,0,0,0.7);
+    }
+main {
+    margin: 0;
+    padding: 0;
+    background: none;
+}

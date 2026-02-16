@@ -1,0 +1,110 @@
+﻿@* @model IEnumerable<CoursesApplication.Domain.DomainModels.BookCopy>
+
+<h2>Book Copies</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+</p>
+
+<form asp-action="ByBook" method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <input name="bookId" class="form-control" placeholder="Filter by BookId (GUID)" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-secondary">Filter</button>
+    </div>
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>InventoryCode</th>
+            <th>BookId</th>
+            <th>BookBorrowingId</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var c in Model)
+        {
+            <tr>
+                <td>@c.InventoryCode</td>
+                <td>@c.BookId</td>
+                <td>@c.BookBorrowingId</td>
+                <td class="text-nowrap">
+                    <a asp-action="Details" asp-route-id="@c.Id">Details</a> |
+                    <a asp-action="Edit" asp-route-id="@c.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-id="@c.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table> *@
+
+@model IEnumerable<CoursesApplication.Domain.DomainModels.BookCopy>
+@{
+    ViewData["Title"] = "Book Copies";
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Book Copies</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+        <h2 class="mb-0">Book Copies</h2>
+        <a asp-action="Create" class="btn btn-primary">Create New</a>
+    </div>
+
+    <form asp-action="ByBook" method="get" class="row g-2 mb-3">
+        <div class="col-12 col-md-5">
+            <input name="bookId" class="form-control" placeholder="Filter by BookId (GUID)" />
+        </div>
+        <div class="col-12 col-md-auto">
+            <button type="submit" class="btn btn-outline-secondary">Filter</button>
+        </div>
+    </form>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Inventory Code</th>
+                        <th>Book</th>
+                        <th>Current Borrowing</th>
+                        <th class="text-end" style="width: 220px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var c in Model)
+                    {
+                        <tr>
+                            <td>@c.InventoryCode</td>
+                            <td>
+                                @c.Book?.Title
+                                <span class="text-muted">(<code>@c.BookId</code>)</span>
+                            </td>
+                            <td>@(@c.BookBorrowingId.HasValue? c.BookBorrowingId.ToString() : "—")</td>
+                            <td class="text-end">
+                                <a asp-action="Details" asp-route-id="@c.Id" class="btn btn-sm btn-outline-info me-1">Details</a>
+                                <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-warning me-1">Edit</a>
+                                <a asp-action="Delete" asp-route-id="@c.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info" role="alert">
+            No book copies found. <a asp-action="Create" class="alert-link">Add one now</a>.
+        </div>
+    }
+</div>

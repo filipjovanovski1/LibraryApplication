@@ -1,0 +1,286 @@
+﻿@* @model CoursesApplication.Domain.Identity.User
+@using CoursesApplication.Domain.DomainModels
+@{
+    ViewData["Title"] = "User Details";
+    var borrowings = ViewBag.Borrowings as List<BookBorrowing> ?? new();
+    var borrowingLogs = ViewBag.BorrowingLogs as List<BorrowingBookLog> ?? new();
+    var takenSeatLogs = ViewBag.TakenSeatLogs as List<TakenSeatLog> ?? new();
+    var currentSeat = ViewBag.CurrentSeat as TakenSeat;
+}
+
+<div class="container py-4">
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">User Profile</h5>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Name</dt>
+                <dd class="col-sm-9">@Model.Name</dd>
+
+                <dt class="col-sm-3">Surname</dt>
+                <dd class="col-sm-9">@Model.Surname</dd>
+
+                <dt class="col-sm-3">Role</dt>
+                <dd class="col-sm-9">@Model.Role?.Name</dd>
+
+                <dt class="col-sm-3">Current Seat</dt>
+                <dd class="col-sm-9">
+                    @if (currentSeat != null)
+                    {
+                        <span class="badge bg-primary">Seat @currentSeat.Seat?.Number</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">—</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <h4>Borrowings</h4>
+    @if (borrowings.Any())
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr><th>Book</th><th>Borrowed At</th><th>Due Date</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var b in borrowings)
+                {
+                    <tr>
+                        <td>@b.BookCopy?.Book?.Title</td>
+                        <td>@b.BorrowedAt:yyyy-MM-dd</td>
+                        <td>@(b.DueDate?.ToString("yyyy-MM-dd") ?? "—")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+
+        <p class="text-muted">No borrowings.</p>
+    }
+
+    <h4>Borrowing Logs</h4>
+    @if (borrowingLogs.Any())
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Book</th>
+                    <th>Copy</th>
+                    <th>Borrowed</th>
+                    <th>Due</th>
+                    <th>Returned</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var log in borrowingLogs)
+                {
+                    <tr>
+                        <td>@log.BookCopy?.Book?.Title</td>
+                        <td>@log.BookCopyId</td>
+                        <td>@log.BorrowedAt:yyyy-MM-dd</td>
+                        <td>@(log.DueDate?.ToString("yyyy-MM-dd") ?? "—")</td>
+                        <td>@(log.ReturnedAt.ToString("yyyy-MM-dd") ?? "—")</td>
+                        <td>@(string.IsNullOrWhiteSpace(log.Notes) ? "—" : log.Notes)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+
+        <p class="text-muted">No borrowing logs.</p>
+    }
+
+    <h4>Taken Seat Logs</h4>
+    @if (takenSeatLogs.Any())
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr><th>Seat</th><th>Started</th><th>Ended</th><th>Reason</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var s in takenSeatLogs)
+                {
+                    <tr>
+                        <td>@s.Seat?.Number</td>
+                        <td>@s.StartedAt:yyyy-MM-dd</td>
+                        <td>@(s.FreedAt.ToString("yyyy-MM-dd") ?? "—")</td>
+                        <td>@(string.IsNullOrWhiteSpace(s.Reason) ? "—" : s.Reason)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+
+        <p class="text-muted">No seat logs.</p>
+    }
+
+    <div class="mt-3">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+        <a asp-action="Index" class="btn btn-outline-secondary ms-2">Back</a>
+    </div>
+</div> *@
+
+@model CoursesApplication.Domain.Identity.User
+@using Microsoft.AspNetCore.Identity
+@using CoursesApplication.Domain.Identity
+@using CoursesApplication.Domain.DomainModels
+@inject UserManager<User> UserManager
+
+@{
+    ViewData["Title"] = "User Details";
+
+    // related data from controller
+    var borrowings = ViewBag.Borrowings as List<BookBorrowing> ?? new();
+    var borrowingLogs = ViewBag.BorrowingLogs as List<BorrowingBookLog> ?? new();
+    var takenSeatLogs = ViewBag.TakenSeatLogs as List<TakenSeatLog> ?? new();
+    var currentSeat = ViewBag.CurrentSeat as TakenSeat;
+
+    // roles via UserManager (Option A)
+    var roles = await UserManager.GetRolesAsync(Model);
+}
+
+<div class="container py-4">
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">User Profile</h5>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-3">Name</dt>
+                <dd class="col-sm-9">@Model.Name</dd>
+
+                <dt class="col-sm-3">Surname</dt>
+                <dd class="col-sm-9">@Model.Surname</dd>
+
+                <dt class="col-sm-3">Roles</dt>
+                <dd class="col-sm-9">
+                    @if (roles != null && roles.Count > 0)
+                    {
+                        @string.Join(", ", roles)
+                    }
+                    else
+                    {
+                        <span class="text-muted">—</span>
+                    }
+                </dd>
+
+                <dt class="col-sm-3">Current Seat</dt>
+                <dd class="col-sm-9">
+                    @if (currentSeat != null)
+                    {
+                        <span class="badge bg-primary">Seat @currentSeat.Seat?.Number</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">—</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+    </div>
+
+    <h4>Borrowings</h4>
+    @if (borrowings.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr><th>Book</th><th>Borrowed At</th><th>Due Date</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var b in borrowings)
+                    {
+                        <tr>
+                            <td>@b.BookCopy?.Book?.Title</td>
+                            <td>@b.BorrowedAt:yyyy-MM-dd</td>
+                            <td>@(b.DueDate?.ToString("yyyy-MM-dd") ?? "—")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="text-muted">No borrowings.</p>
+    }
+
+    <h4>Borrowing Logs</h4>
+    @if (borrowingLogs.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr>
+                        <th>Book</th>
+                        <th>Copy</th>
+                        <th>Borrowed</th>
+                        <th>Due</th>
+                        <th>Returned</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var log in borrowingLogs)
+                    {
+                        <tr>
+                            <td>@log.BookCopy?.Book?.Title</td>
+                            <td>@log.BookCopyId</td>
+                            <td>@log.BorrowedAt:yyyy-MM-dd</td>
+                            <td>@(log.DueDate?.ToString("yyyy-MM-dd") ?? "—")</td>
+                            <td>@(log.ReturnedAt.ToString("yyyy-MM-dd") ?? "—")</td>
+                            <td>@(string.IsNullOrWhiteSpace(log.Notes) ? "—" : log.Notes)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="text-muted">No borrowing logs.</p>
+    }
+
+    <h4>Taken Seat Logs</h4>
+    @if (takenSeatLogs.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead>
+                    <tr><th>Seat</th><th>Started</th><th>Ended</th><th>Reason</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in takenSeatLogs)
+                    {
+                        <tr>
+                            <td>@s.Seat?.Number</td>
+                            <td>@s.StartedAt:yyyy-MM-dd</td>
+                            <td>@(s.FreedAt.ToString("yyyy-MM-dd") ?? "—")</td>
+                            <td>@(string.IsNullOrWhiteSpace(s.Reason) ? "—" : s.Reason)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <p class="text-muted">No seat logs.</p>
+    }
+
+    <div class="mt-3">
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+        <a asp-action="Index" class="btn btn-outline-secondary ms-2">Back</a>
+    </div>
+</div>

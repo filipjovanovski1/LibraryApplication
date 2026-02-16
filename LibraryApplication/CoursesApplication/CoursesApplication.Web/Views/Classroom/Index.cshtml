@@ -1,0 +1,86 @@
+﻿@* @model IEnumerable<CoursesApplication.Domain.DomainModels.Classroom>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<div class="hero-section">
+    <h1>Читални</h1>
+    <h2>
+        На оваа страница можете да ги прегледате сите читални.
+        <p>Со избор на конкретна читална ќе го видите распоредот на седишта и нивната зафатеност, како и можност да внесете лице на одредено место или да откажете зафатено седиште.</p>
+    </h2>
+</div>
+
+<a asp-action="Create"  class="btn btn-primary">
+    Add new classroom
+</a>
+
+<p>Search pole za prebaruvanje na taken seats all from to time, site taken seats za eden classroom i user search kade shto kje se proveruva dali userot ima takenseat i site logs za toj user</p>
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+
+    @foreach (var item in Model)
+    {
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">@Html.DisplayFor(modelItem => item.Name)</h5>
+                    <p class="card-text">@Html.DisplayFor(modelItem => item.Location)</p>
+                    <p class="card-text">@Html.DisplayFor(modelItem => item.Capacity)</p>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary">
+                        Check classroom availability
+                    </a>
+                 </div>
+             </div>
+         </div>
+    }
+</div>
+
+ *@
+
+@model IEnumerable<CoursesApplication.Domain.DomainModels.Classroom>
+@{
+    ViewData["Title"] = "Classrooms";
+}
+<div class="container py-4">
+    <div class="mb-4">
+        <h1 class="mb-1">Classrooms</h1>
+        <p class="text-muted mb-0">
+            On this page, you can view all the classrooms. By selecting a specific classroom, you will see the seating layout and their occupancy, as well as have the option to assign a person to a particular seat or cancel an occupied seat.
+        </p>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a asp-action="Create" class="btn btn-primary">Add new classroom</a>
+        @* (Optional) Place for future filters/search *@
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">No classrooms found.</div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">@item.Name</h5>
+                            <p class="card-text mb-1"><strong>Location:</strong> @item.Location</p>
+                            <p class="card-text"><strong>Capacity:</strong> @item.Capacity</p>
+                        </div>
+                        <div class="card-footer">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                Check classroom availability
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

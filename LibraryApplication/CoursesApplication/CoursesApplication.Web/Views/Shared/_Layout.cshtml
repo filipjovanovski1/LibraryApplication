@@ -1,0 +1,74 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - City Library „Brakja Miladinovci"</title>
+
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">City Library „Brakja Miladinovci"</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <nav id="mainNav" class="collapse navbar-collapse">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link" asp-controller="Books" asp-action="Index">Books</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Classroom" asp-action="Index">Classrooms</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Authors" asp-action="Index">Authors</a></li>
+                    <li class="nav-item"><a class="nav-link" asp-controller="Users" asp-action="Index">Users</a></li>
+                </ul>
+                <!-- RIGHT SIDE: auth links -->
+                <ul class="navbar-nav ms-auto">
+                    @* @if (SignInManager.IsSignedIn(User))
+                    {
+                        <li class="nav-item">
+                            <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="nav-link btn btn-link p-0 text-decoration-none">
+                                    Logout (@User.Identity?.Name)
+                                </button>
+                            </form>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Register</a>
+                        </li>
+                    } *@
+                    @if (User?.Identity?.IsAuthenticated ?? false)
+                    {
+                        <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="nav-link btn btn-link p-0 text-decoration-none">Logout</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Login</a>
+                    }
+
+                </ul>
+
+            </nav>
+        </div>
+    </header>
+
+    <main role="main" >
+        @RenderBody()
+    </main>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

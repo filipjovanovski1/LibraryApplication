@@ -1,0 +1,74 @@
+﻿@* @model CoursesApplication.Domain.DomainModels.BookBorrowing
+
+<h2>Delete Borrowing</h2>
+<h4>Are you sure you want to delete this record?</h4>
+
+<dl class="row">
+    <dt class="col-sm-2">UserId</dt>
+    <dd class="col-sm-10">@Model.UserId</dd>
+    <dt class="col-sm-2">BookCopyId</dt>
+    <dd class="col-sm-10">@Model.BookCopyId</dd>
+    <dt class="col-sm-2">BorrowedAt</dt>
+    <dd class="col-sm-10">@Model.BorrowedAt</dd>
+    <dt class="col-sm-2">DueDate</dt>
+    <dd class="col-sm-10">@Model.DueDate</dd>
+</dl>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form> *@
+
+
+@model CoursesApplication.Domain.DomainModels.BookBorrowing
+@{
+    ViewData["Title"] = "Delete Borrowing";
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="BookBorrowings" asp-action="Index">Borrowings</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Delete</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-7">
+            <div class="card shadow-sm border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Delete Borrowing</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Are you sure?</strong> This action cannot be undone.
+                    </div>
+
+                    <dl class="row mb-0">
+                        <dt class="col-sm-3">User</dt>
+                        <dd class="col-sm-9">@Model.UserId</dd>
+
+                        <dt class="col-sm-3">Book Copy</dt>
+                        <dd class="col-sm-9"><code>@Model.BookCopyId</code></dd>
+
+                        <dt class="col-sm-3">Borrowed At</dt>
+                        <dd class="col-sm-9">@Model.BorrowedAt:yyyy-MM-dd</dd>
+
+                        <dt class="col-sm-3">Due Date</dt>
+                        <dd class="col-sm-9">@Model.DueDate:yyyy-MM-dd</dd>
+                    </dl>
+                </div>
+                <div class="card-footer d-flex justify-content-between gap-2">
+                    <form asp-action="Delete" method="post" class="m-0 p-0 d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="Id" />
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

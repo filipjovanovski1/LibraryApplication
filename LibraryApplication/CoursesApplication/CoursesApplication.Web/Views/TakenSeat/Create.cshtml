@@ -1,0 +1,120 @@
+﻿@* @model CoursesApplication.Domain.DomainModels.TakenSeat
+
+<h2>Take Seat</h2>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger"></div>
+ 
+
+    <!-- CRUCIAL: post the IDs -->
+    <input type="hidden" asp-for="SeatId" />
+
+    <div class="mb-3">
+        <label>Seat Number</label>
+        <input class="form-control" value="@ViewBag.SeatNumber" disabled />
+    </div>
+
+    <div class="mb-3">
+        <label>Classroom Name</label>
+        <input class="form-control" value="@ViewBag.ClassroomName" disabled />
+    </div>
+
+    <div class="mb-3">
+        <label>Classroom Location</label>
+        <input class="form-control" value="@ViewBag.ClassroomLocation" disabled />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="UserId" class="form-label">User</label>
+        <select asp-for="UserId" class="form-control" asp-items="ViewBag.Users">
+            <option value="">-- Select User --</option>
+        </select>
+        <span asp-validation-for="UserId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="StartedAt" class="form-label">Start Time</label>
+        <input asp-for="StartedAt" type="datetime-local" class="form-control" />
+        <span asp-validation-for="StartedAt" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Take Seat</button>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</form> *@
+
+@model CoursesApplication.Domain.DomainModels.TakenSeat
+@{
+    ViewData["Title"] = "Take Seat";
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Classroom" asp-action="Index">Classrooms</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Take Seat</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Take Seat</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post" novalidate>
+                        @Html.AntiForgeryToken()
+
+                        <div class="alert alert-danger d-none" role="alert" data-valmsg-summary="true"><ul></ul></div>
+
+                        <!-- CRUCIAL: post the IDs -->
+                        <input type="hidden" asp-for="SeatId" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Seat Number</label>
+                            <input class="form-control" value="@ViewBag.SeatNumber" readonly />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Classroom Name</label>
+                            <input class="form-control" value="@ViewBag.ClassroomName" readonly />
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Classroom Location</label>
+                            <input class="form-control" value="@ViewBag.ClassroomLocation" readonly />
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="UserId" class="form-label">User <span class="text-danger">*</span></label>
+                            <select asp-for="UserId" class="form-select" asp-items="ViewBag.Users">
+                                <option value="">-- Select User --</option>
+                            </select>
+                            <span asp-validation-for="UserId" class="text-danger small"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="StartedAt" class="form-label">Start Time <span class="text-danger">*</span></label>
+                            <input asp-for="StartedAt" type="datetime-local" class="form-control" />
+                            <span asp-validation-for="StartedAt" class="text-danger small"></span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">Take Seat</button>
+                            <a asp-controller="Classroom" asp-action="Details" asp-route-id="@ViewBag.ClassroomId" class="btn btn-outline-secondary">Back</a>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-muted small">
+                    Fields marked with <span class="text-danger">*</span> are required.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

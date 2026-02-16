@@ -1,0 +1,262 @@
+﻿@* @model CoursesApplication.Domain.DomainModels.Classroom
+
+<h2>Classroom Details</h2>
+
+<dl class="row">
+    <dt class="col-sm-2">Name</dt>
+    <dd class="col-sm-10">@Model.Name</dd>
+    <dt class="col-sm-2">Location</dt>
+    <dd class="col-sm-10">@Model.Location</dd>
+    <dd class="col-sm-10">@Model.Capacity</dd>
+</dl>
+
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Edit</a>
+    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-primary">Delete</a>
+    <a asp-action="Index" class="btn btn-secondary">Back</a>
+</p>
+
+<h3>Seats</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Seat Number</th>
+            <th>Availability</th>
+            <th class="text-end">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var seat in Model.Seats)
+        {
+            <tr>
+                <td>@seat.Number</td>
+                <td>
+                    @if (seat.IsTaken)
+                    {
+                        <span class="badge bg-danger">Taken</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">Available</span>
+                    }
+                </td>
+                <td class="text-end text-nowrap">
+                    <!-- View seat details -->
+                    <a asp-controller="Seat"
+                       asp-action="Details"
+                       asp-route-id="@seat.Id"
+                       class="btn btn-outline-secondary btn-sm">
+                        Display seat
+                    </a>
+
+                    @if (seat.IsTaken)
+                    {
+                       
+                        <!-- Free the seat (POST) -->
+                        <form asp-controller="TakenSeat"
+                              asp-action="Delete"
+                              asp-route-id="@seat.TakenSeatId"
+                              method="post"
+                              class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-warning btn-sm">
+                                Free the seat
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <!-- Take the seat (navigate to a page or start a flow) -->
+                        <a asp-controller="TakenSeat"
+                           asp-action="Create"
+                           asp-route-SeatId="@seat.Id"
+                           class="btn btn-primary btn-sm">
+                            Take the seat
+                        </a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@{
+    var blocked = (bool?)ViewBag.BlockedByTakenSeats == true;
+}
+
+<div class="modal fade" id="blockedModal" tabindex="-1" aria-hidden="true" aria-labelledby="blockedTitle">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="blockedTitle" class="modal-title">Cannot edit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                You cannot edit this classroom unless all seats are freed.
+            </div>
+            <div class="modal-footer">
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-secondary">Cancel</a>
+
+                <form asp-action="FreeAllSeats"
+                      asp-route-id="@Model.Id"
+                      asp-route-returnAction="Edit"
+                      asp-route-newCapacity="@ViewBag.NewSeats"
+                      method="post"
+                      class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Free all seats</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+          var shouldShow = @((blocked ? "true" : "false").ToLower());
+          if (shouldShow) {
+            var m = new bootstrap.Modal(document.getElementById('blockedModal'));
+            m.show();
+          }
+        });
+    </script>
+}
+ *@
+@model CoursesApplication.Domain.DomainModels.Classroom
+@{
+    ViewData["Title"] = "Classroom Details";
+    var blocked = (bool?)ViewBag.BlockedByTakenSeats == true;
+}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item"><a asp-controller="Classroom" asp-action="Index">Classrooms</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Details</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Classroom Details</h5>
+        </div>
+        <div class="card-body">
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Name</dt>
+                <dd class="col-sm-9">@Model.Name</dd>
+
+                <dt class="col-sm-3">Location</dt>
+                <dd class="col-sm-9">@Model.Location</dd>
+
+                <dt class="col-sm-3">Capacity</dt>
+                <dd class="col-sm-9">@Model.Capacity</dd>
+            </dl>
+        </div>
+        <div class="card-footer d-flex gap-2">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+            <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">Delete</a>
+            <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h6 class="mb-0">Seats (@(Model.Seats?.Count ?? 0))</h6>
+        </div>
+        <div class="card-body">
+            @if (Model.Seats == null || !Model.Seats.Any())
+            {
+                <p class="text-muted mb-0">No seats in this classroom.</p>
+            }
+            else
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Seat Number</th>
+                                <th>Availability</th>
+                                <th class="text-end" style="width: 320px;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var seat in Model.Seats)
+                            {
+                                <tr>
+                                    <td>@seat.Number</td>
+                                    <td>
+                                        @if (seat.IsTaken)
+                                        {
+                                            <span class="badge bg-danger">Taken</span>
+                                        }
+                                        else
+                                        {
+
+                                            <span class="badge bg-success">Available</span>
+                                        }
+                                    </td>
+                                    <td class="text-end text-nowrap">
+                                        <a asp-controller="Seat" asp-action="Details" asp-route-id="@seat.Id"
+                                           class="btn btn-sm btn-outline-secondary">Display seat</a>
+
+                                        @if (seat.IsTaken)
+                                        {
+                                            <form asp-controller="TakenSeat" asp-action="Delete" asp-route-id="@seat.TakenSeatId"
+                                                  method="post" class="d-inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-warning">Free the seat</button>
+                                            </form>
+                                        }
+                                        else
+                                        {
+                                            <a asp-controller="TakenSeat" asp-action="Create" asp-route-SeatId="@seat.Id"
+                                               class="btn btn-sm btn-primary">Take the seat</a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Blocked modal -->
+<div class="modal fade" id="blockedModal" tabindex="-1" aria-hidden="true" aria-labelledby="blockedTitle">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="blockedTitle" class="modal-title">Cannot edit</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                You cannot edit this classroom unless all seats are freed.
+            </div>
+            <div class="modal-footer">
+                <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
+                <form asp-action="FreeAllSeats" asp-route-id="@Model.Id" asp-route-returnAction="Edit"
+                      asp-route-newCapacity="@ViewBag.NewSeats" method="post" class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Free all seats</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var shouldShow = @((blocked ? "true" : "false").ToLower());
+            if (shouldShow) {
+                var m = new bootstrap.Modal(document.getElementById('blockedModal'));
+                m.show();
+            }
+        });
+    </script>
+}
+

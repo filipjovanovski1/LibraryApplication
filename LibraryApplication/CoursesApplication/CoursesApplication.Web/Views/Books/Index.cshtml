@@ -1,0 +1,168 @@
+﻿@* @model IEnumerable<CoursesApplication.Domain.DomainModels.Book>
+@using System.Linq
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Books";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form method="get" asp-controller="Books" asp-action="Index" class="mb-3">
+    <div class="row g-2 align-items-end">
+        <div class="col-auto">
+            <label class="form-label">Category</label>
+            <select name="category" class="form-select">
+                <option value="">All</option>
+                @foreach (var opt in (IEnumerable<SelectListItem>)ViewBag.CategoryOptions)
+                {
+                    var selected = (string)ViewBag.SelectedCategory == opt.Value ? "selected" : null;
+                    <option value="@opt.Value" selected="@selected">@opt.Text</option>
+                }
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Filter</button>
+            <a asp-controller="Books" asp-action="Index" class="btn btn-secondary">Reset</a>
+        </div>
+    </div>
+</form>
+
+@if (Model == null || !Model.Any())
+{
+    <div>No books found.</div>
+}
+
+<div class="row row-cols-1 row-cols-md-3 g-4">
+    @foreach (var book in Model ?? Enumerable.Empty<CoursesApplication.Domain.DomainModels.Book>())
+    {
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">@book.Title</h5>
+                    <p class="card-text">
+                        <strong>Category:</strong> @(book.Category != null ? book.Category.ToString().Replace('_', ' ') : "N/A") <br />
+                        <strong>Authors:</strong> @string.Join(", ", book.Authors.Select(a => $"{a.Name} {a.Surname}"))
+                    </p>
+                </div>
+                <div class="card-footer d-flex justify-content-between">
+                    <a asp-controller="Books" asp-action="Details" asp-route-id="@book.Id" class="btn btn-primary btn-sm">Details</a>
+                    <a asp-controller="Books" asp-action="Edit" asp-route-id="@book.Id" class="btn btn-warning btn-sm">Edit</a>
+                    <form asp-controller="Books" asp-action="Delete" asp-route-id="@book.Id" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this book?');">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="mb-3">
+    <a asp-controller="Books" asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-lg"></i> Create New Book
+    </a>
+</div>
+
+@if (TempData["Message"] is string msg)
+{
+    <div class="alert alert-success">@msg</div>
+}
+
+<form method="post" asp-controller="ExternalBooks" asp-action="Import" class="mb-3">
+    @Html.AntiForgeryToken()
+    <button class="btn btn-primary">Import books from API</button>
+</form>
+ *@
+
+
+@model IEnumerable<CoursesApplication.Domain.DomainModels.Book>
+@using System.Linq
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    ViewData["Title"] = "Books";
+}
+
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Books</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+        <h2 class="mb-0">Books</h2>
+        <div>
+            <a asp-controller="Books" asp-action="Create" class="btn btn-success me-2">
+                <i class="bi bi-plus-lg"></i> Create New Book
+            </a>
+            <form method="post" asp-controller="ExternalBooks" asp-action="Import" class="d-inline">
+                @Html.AntiForgeryToken()
+                <button class="btn btn-primary">Import books from API</button>
+            </form>
+        </div>
+    </div>
+
+    <form method="get" asp-controller="Books" asp-action="Index" class="mb-3">
+        <div class="row g-2 align-items-end">
+            <div class="col-auto">
+                <label class="form-label">Category</label>
+                <select name="category" class="form-select">
+                    <option value="">All</option>
+                    @foreach (var opt in (IEnumerable<SelectListItem>)ViewBag.CategoryOptions)
+                    {
+                        var sel = (string)ViewBag.SelectedCategory == opt.Value ? "selected" : null;
+                        <option value="@opt.Value" selected="@sel">@opt.Text</option>
+                    }
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-outline-primary">Filter</button>
+                <a asp-controller="Books" asp-action="Index" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </div>
+    </form>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info">No books found.</div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var book in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">@book.Title</h5>
+                            <p class="card-text">
+                                <strong>Category:</strong> @(book.Category?.ToString().Replace('_', ' ') ?? "N/A")<br />
+                                <strong>Authors:</strong> @string.Join(", ", book.Authors.Select(a => $"{a.Name} {a.Surname}"))
+                            </p>
+                        </div>
+                        <div class="card-footer d-flex justify-content-between">
+                            <a asp-controller="Books" asp-action="Details" asp-route-id="@book.Id" class="btn btn-sm btn-outline-primary">Details</a>
+                            <a asp-controller="Books" asp-action="Edit" asp-route-id="@book.Id" class="btn btn-sm btn-outline-warning">Edit</a>
+                            <form asp-controller="Books" asp-action="Delete" asp-route-id="@book.Id" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                        onclick="return confirm('Are you sure you want to delete this book?');">
+                                    Delete
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @if (TempData["Message"] is string msg)
+    {
+        <div class="alert alert-success mt-3">@msg</div>
+    }
+</div>
