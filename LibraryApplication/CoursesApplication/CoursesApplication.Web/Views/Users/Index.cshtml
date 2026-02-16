@@ -10,7 +10,10 @@
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="mb-0">Users</h2>
-        <a asp-action="Create" class="btn btn-success">+ Create New</a>
+        @if (User.IsInRole("Librarian"))
+        {
+            <a asp-action="Create" class="btn btn-success">+ Create New</a>
+        }
     </div>
 
     <div class="table-responsive">
@@ -42,8 +45,11 @@
                         </td>
                         <td>
                             <a asp-action="Details" asp-route-id="@u.Id" class="btn btn-outline-secondary btn-sm">Details</a>
+                            @if (User.IsInRole("Librarian"))
+                            {
                             <a asp-action="Edit" asp-route-id="@u.Id" class="btn btn-outline-primary btn-sm ms-1">Edit</a>
                             <a asp-action="Delete" asp-route-id="@u.Id" class="btn btn-outline-danger btn-sm ms-1">Delete</a>
+                            }
                         </td>
                     </tr>
                 }

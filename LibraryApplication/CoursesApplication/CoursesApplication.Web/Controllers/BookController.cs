@@ -50,12 +50,13 @@ namespace CoursesApplication.Web.Controllers
       
         private async Task<List<SelectListItem>> BuildCategoryOptionsAsync()
         {
-            var cats = await _db.Set<Book>()
+            var cats = (await _db.Set<Book>()
                 .Where(b => b.Category != null)
                 .Select(b => b.Category!.Value)
                 .Distinct()
+                .ToListAsync())
                 .OrderBy(c => c.ToString())
-                .ToListAsync();
+                .ToList();
 
             return cats
                 .Select(c => new SelectListItem

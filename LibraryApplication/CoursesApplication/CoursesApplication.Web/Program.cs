@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // ----------------- DB provider selection -----------------
 var env = builder.Environment;
-var provider = builder.Configuration["DbProvider"] ?? "Sqlite"; // "Postgres" | "Sqlite" | "InMemory"
+var provider = builder.Configuration["DbProvider"] ?? "Sqlite"; // "Sqlite" | "Postgres" | "SqlServer" | "InMemory"
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
@@ -24,14 +24,22 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     {
         options.UseInMemoryDatabase("InMemoryDatabase");
     }
+    else if (provider.Equals("Sqlite", StringComparison.OrdinalIgnoreCase))
+    {
+        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    }
     else if (provider.Equals("Postgres", StringComparison.OrdinalIgnoreCase))
     {
         options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection"));
         // AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
     }
-    else // Sqlite default
+    else if (provider.Equals("SqlServer", StringComparison.OrdinalIgnoreCase))
     {
-        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+        options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerConnection"));
+    }
+    else
+    {
+        throw new InvalidOperationException($"Unsupported DbProvider '{provider}'. Use Sqlite, Postgres, SqlServer, or InMemory.");
     }
 });
 
@@ -157,17 +165,17 @@ static async Task EnsureSeedAsync(UserManager<User> users, RoleManager<Role> rol
 
     // 2) Ensure users exist and are in the right roles
     await SeedUserAsync(users,
-        email: "librarian@demo.local",
+        email: "marko.markovski@gmail.com",
         password: "Lib123!@#",
-        name: "Petre",
-        surname: "Petreski",
+        name: "Marko",
+        surname: "Markovski",
         rolesToAdd: new[] { "Librarian" });
 
     await SeedUserAsync(users,
-        email: "keeper@demo.local",
+        email: "andreaa_janevska@outlook.com",
         password: "Keep123!@#",
-        name: "Mila",
-        surname: "Milovska",
+        name: "Andrea",
+        surname: "Janevska",
         rolesToAdd: new[] { "Keeper" });
 }
 

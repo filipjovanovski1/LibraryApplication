@@ -42,7 +42,9 @@
 
 @model IEnumerable<CoursesApplication.Domain.DomainModels.Classroom>
 @{
+
     ViewData["Title"] = "Classrooms";
+
 }
 <div class="container py-4">
     <div class="mb-4">
@@ -51,12 +53,14 @@
             On this page, you can view all the classrooms. By selecting a specific classroom, you will see the seating layout and their occupancy, as well as have the option to assign a person to a particular seat or cancel an occupied seat.
         </p>
     </div>
+    @if (User.IsInRole("Keeper"))
+    {
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <a asp-action="Create" class="btn btn-primary">Add new classroom</a>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <a asp-action="Create" class="btn btn-primary">Add new classroom</a>
         @* (Optional) Place for future filters/search *@
     </div>
-
+    }
     @if (Model == null || !Model.Any())
     {
         <div class="alert alert-info">No classrooms found.</div>

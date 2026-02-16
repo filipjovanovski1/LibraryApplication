@@ -11,10 +11,11 @@ using System;
 using System.Linq;
 using AppUser = CoursesApplication.Domain.Identity.User;
 
-
 namespace CoursesApplication.Web.Controllers
 {
-    
+
+    [Authorize(Roles="Librarian,Keeper")]
+
     public class UsersController : Controller
     {
         private readonly IUserService _users;
