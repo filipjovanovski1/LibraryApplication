@@ -87,7 +87,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddHttpClient("BookApi", c =>
 {
     c.BaseAddress = new Uri("http://localhost:5177/");
-    c.Timeout = TimeSpan.FromSeconds(15);
+    c.Timeout = TimeSpan.FromSeconds(45);
 });
 
 // External import client/services

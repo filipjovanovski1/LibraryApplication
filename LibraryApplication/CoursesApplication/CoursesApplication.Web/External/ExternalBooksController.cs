@@ -1,7 +1,7 @@
 ﻿// Controllers/ExternalBooksController.cs
 using CoursesApplication.Web.Services;
 using Microsoft.AspNetCore.Mvc;
-
+using CoursesApplication.Web.External;
 
 namespace CoursesApplication.Web.Controllers
 {
@@ -19,9 +19,16 @@ namespace CoursesApplication.Web.Controllers
                 ? null
                 : categories.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-            var changed = await _import.ImportAsync(catList, ct);
+            try
+            {
+                var changed = await _import.ImportAsync(catList, ct);
+                TempData["Message"] = $"Imported/updated {changed} record(s).";
+            }
+            catch (ExternalBookApiException ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
 
-            TempData["Message"] = $"Imported/updated {changed} record(s).";
             TempData["Categories"] = categories;              // keep last used value
             return RedirectToAction("Index", "Books", new { categories }); // repopulate on next render
         }

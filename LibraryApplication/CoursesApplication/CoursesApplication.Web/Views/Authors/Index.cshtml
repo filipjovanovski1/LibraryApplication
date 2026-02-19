@@ -77,10 +77,17 @@
                             <td class="text-end">
                                 <a asp-action="Details" asp-route-id="@author.Id"
                                    class="btn btn-sm btn-outline-info me-1">Details</a>
-                                <a asp-action="Edit" asp-route-id="@author.Id"
-                                   class="btn btn-sm btn-outline-warning me-1">Edit</a>
-                                <a asp-action="Delete" asp-route-id="@author.Id"
-                                   class="btn btn-sm btn-outline-danger">Delete</a>
+                                @if (User.IsInRole("Librarian") || User.IsInRole("Keeper"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@author.Id"
+                                       class="btn btn-sm btn-outline-warning me-1">Edit</a>
+                                }
+
+                                @if(User.IsInRole("Librarian"))
+                                {
+                                    <a asp-action="Delete" asp-route-id="@author.Id"
+                                       class="btn btn-sm btn-outline-danger">Delete</a>
+                                }
                             </td>
                         </tr>
                     }

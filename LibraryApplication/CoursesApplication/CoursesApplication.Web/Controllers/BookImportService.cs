@@ -2,7 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using CoursesApplication.Domain.DomainModels;
 using CoursesApplication.Repository.Data;
 using CoursesApplication.Domain.DTO;      
-using CoursesApplication.Web.External;   
+using CoursesApplication.Web.External;
+using System.Text.RegularExpressions;
 
 namespace CoursesApplication.Web.Services
 {
@@ -32,16 +33,27 @@ namespace CoursesApplication.Web.Services
             const char SEP = '\u241F';
             static string Key(string a, string b) => $"{a}{SEP}{b}";
             static string BookKey(string title, string authorFull) => $"{title}{SEP}{authorFull}";
+            static string Normalize(string? value)
+            {
+                if (string.IsNullOrWhiteSpace(value)) return string.Empty;
+                var collapsed = Regex.Replace(value.Trim(), @"\s+", " ");
+                return collapsed.ToUpperInvariant();
+            }
+
+            static string NormalizeBookKey(string title, string authorFull)
+                => BookKey(Normalize(title), Normalize(authorFull));
 
             var existingAuthors = await authorsSet
-                .ToDictionaryAsync(a => Key(a.Name, a.Surname), ct);
+                .ToDictionaryAsync(a => Key(Normalize(a.Name), Normalize(a.Surname)), ct);
 
             var existingBooks = await booksSet
                 .Include(b => b.Authors)
                 .ToListAsync(ct);
 
             var existingBookMap = existingBooks.ToDictionary(
-                b => BookKey(b.Title, b.Authors.FirstOrDefault() is { } aa ? $"{aa.Name} {aa.Surname}".Trim() : "")
+                 b => NormalizeBookKey(
+                    b.Title,
+                    b.Authors.FirstOrDefault() is { } aa ? $"{aa.Name} {aa.Surname}".Trim() : "")
             );
 
             var newAuthors = new List<Author>();
@@ -57,7 +69,7 @@ namespace CoursesApplication.Web.Services
 
                 var (first, last) = SplitAuthor(dto.Author);
 
-                var authorKey = Key(first, last);
+                var authorKey = Key(Normalize(first), Normalize(last));
                 if (!existingAuthors.TryGetValue(authorKey, out var author))
                 {
                     author = new Author { Name = first, Surname = last };
@@ -65,7 +77,7 @@ namespace CoursesApplication.Web.Services
                     newAuthors.Add(author);
                 }
 
-                var bkKey = BookKey(dto.Title, $"{first} {last}".Trim());
+                var bkKey = NormalizeBookKey(dto.Title, $"{first} {last}".Trim());
                 if (!existingBookMap.TryGetValue(bkKey, out var book))
                 {
                     book = new Book

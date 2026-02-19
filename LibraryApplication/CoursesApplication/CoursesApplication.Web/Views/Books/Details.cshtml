@@ -182,7 +182,10 @@ else
             </dl>
         </div>
         <div class="card-footer d-flex gap-2">
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+            @if(!User.IsInRole("Student"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+            }
             <a asp-action="Index" class="btn btn-outline-secondary">Back</a>
         </div>
     </div>
@@ -255,7 +258,10 @@ else
             <form asp-controller="BookCopy" asp-action="CreateInline" method="post" class="d-inline">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="bookId" value="@Model.Id" />
-                <button type="submit" class="btn btn-success">Add a new BookCopy</button>
+                @if(User.IsInRole("Student") || User.IsInRole("Keeper"))
+                {
+                    <button type="submit" class="btn btn-success">Add a new BookCopy</button>
+                }
             </form>
         </div>
     </div>
