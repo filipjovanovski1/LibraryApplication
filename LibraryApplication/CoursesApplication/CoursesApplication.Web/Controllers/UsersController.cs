@@ -276,7 +276,7 @@ namespace CoursesApplication.Web.Controllers
         {
             try
             {
-                (_users as dynamic).DeleteUserAndRelated(id);
+                _users.DeleteUserAndRelated(id);
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)

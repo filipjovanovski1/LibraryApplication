@@ -8,6 +8,7 @@
 }
 
 <div class="container py-4">
+    @Html.AntiForgeryToken()
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2 class="mb-0">Users</h2>
         @if (User.IsInRole("Librarian"))
@@ -17,7 +18,7 @@
     </div>
 
     <div class="table-responsive">
-        <table class="table table-striped align-middle shadow-sm">
+        <table class="table table-striped align-middle shadow-sm" id="usersTable">
             <thead class="table-light">
                 <tr>
                     <th>Name</th>
@@ -48,7 +49,12 @@
                             @if (User.IsInRole("Librarian"))
                             {
                             <a asp-action="Edit" asp-route-id="@u.Id" class="btn btn-outline-primary btn-sm ms-1">Edit</a>
-                            <a asp-action="Delete" asp-route-id="@u.Id" class="btn btn-outline-danger btn-sm ms-1">Delete</a>
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-sm ms-1 js-delete-user"
+                                        data-user-id="@u.Id"
+                                        data-user-name="@($"{u.Name} {u.Surname}".Trim())">
+                                    Delete
+                                </button>
                             }
                         </td>
                     </tr>
@@ -57,3 +63,6 @@
         </table>
     </div>
 </div>
+@section Scripts {
+    <script src="~/js/users-index.js" asp-append-version="true"></script>
+}
