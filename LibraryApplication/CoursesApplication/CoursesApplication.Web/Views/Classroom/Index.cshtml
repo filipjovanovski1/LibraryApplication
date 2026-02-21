@@ -1,46 +1,4 @@
-﻿@* @model IEnumerable<CoursesApplication.Domain.DomainModels.Classroom>
-
-@{
-    ViewData["Title"] = "Index";
-}
-
-
-<div class="hero-section">
-    <h1>Читални</h1>
-    <h2>
-        На оваа страница можете да ги прегледате сите читални.
-        <p>Со избор на конкретна читална ќе го видите распоредот на седишта и нивната зафатеност, како и можност да внесете лице на одредено место или да откажете зафатено седиште.</p>
-    </h2>
-</div>
-
-<a asp-action="Create"  class="btn btn-primary">
-    Add new classroom
-</a>
-
-<p>Search pole za prebaruvanje na taken seats all from to time, site taken seats za eden classroom i user search kade shto kje se proveruva dali userot ima takenseat i site logs za toj user</p>
-
-<div class="row row-cols-1 row-cols-md-3 g-4">
-
-    @foreach (var item in Model)
-    {
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h5 class="card-title">@Html.DisplayFor(modelItem => item.Name)</h5>
-                    <p class="card-text">@Html.DisplayFor(modelItem => item.Location)</p>
-                    <p class="card-text">@Html.DisplayFor(modelItem => item.Capacity)</p>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-primary">
-                        Check classroom availability
-                    </a>
-                 </div>
-             </div>
-         </div>
-    }
-</div>
-
- *@
-
-@model IEnumerable<CoursesApplication.Domain.DomainModels.Classroom>
+﻿@model IEnumerable<CoursesApplication.Domain.DomainModels.Classroom>
 @{
 
     ViewData["Title"] = "Classrooms";
@@ -58,7 +16,7 @@
 
         <div class="d-flex justify-content-between align-items-center mb-3">
             <a asp-action="Create" class="btn btn-primary">Add new classroom</a>
-        @* (Optional) Place for future filters/search *@
+     
     </div>
     }
     @if (Model == null || !Model.Any())
@@ -67,24 +25,40 @@
     }
     else
     {
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-            @foreach (var item in Model)
-            {
-                <div class="col">
-                    <div class="card h-100 shadow-sm">
-                        <div class="card-body">
-                            <h5 class="card-title">@item.Name</h5>
-                            <p class="card-text mb-1"><strong>Location:</strong> @item.Location</p>
-                            <p class="card-text"><strong>Capacity:</strong> @item.Capacity</p>
-                        </div>
-                        <div class="card-footer">
-                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
-                                Check classroom availability
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            }
+        <div class="table-responsive">
+            <table class="table table-striped align-middle shadow-sm" id="classroomsTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Location</th>
+                        <th>Capacity</th>
+                        <th style="width:260px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Location</td>
+                            <td>@item.Capacity</td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                    Check classroom availability
+                                </a>
+                                @if (User.IsInRole("Keeper"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning ms-1">Edit</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     }
 </div>
+
+@section Scripts {
+    <script src="~/js/classrooms-index.js" asp-append-version="true"></script>
+}

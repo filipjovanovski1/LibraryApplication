@@ -45,10 +45,10 @@
                             }
                         </td>
                         <td>
-                            <a asp-action="Details" asp-route-id="@u.Id" class="btn btn-outline-secondary btn-sm">Details</a>
+                            <a asp-action="Details" asp-route-id="@u.Id" class="btn btn-sm btn-outline-primary">Details</a>
                             @if (User.IsInRole("Librarian"))
                             {
-                            <a asp-action="Edit" asp-route-id="@u.Id" class="btn btn-outline-primary btn-sm ms-1">Edit</a>
+                                <a asp-action="Edit" asp-route-id="@u.Id" class="btn btn-sm btn-outline-warning me-1">Edit</a>
                                 <button type="button"
                                         class="btn btn-outline-danger btn-sm ms-1 js-delete-user"
                                         data-user-id="@u.Id"

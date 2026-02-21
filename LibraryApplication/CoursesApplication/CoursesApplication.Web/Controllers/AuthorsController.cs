@@ -20,11 +20,22 @@ namespace CoursesApplication.Web.Controllers
             _authorService = authorService;
             _db = db;
         }
+        [HttpGet]
+        [AllowAnonymous]
         public IActionResult Index()
         {
             var authors = _authorService.GetAll();
+            if (!(User?.Identity?.IsAuthenticated ?? false))
+            {
+                return View("IndexAjax", authors
+                    .OrderBy(a => a.Name)
+                    .ThenBy(a => a.Surname)
+                    .ToList());
+            }
             return View(authors);
         }
+
+       
 
         public async Task<IActionResult> Details(Guid id)
         {

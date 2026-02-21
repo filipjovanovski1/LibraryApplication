@@ -68,6 +68,7 @@ namespace CoursesApplication.Web.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> Index(string? category)
         {
             var query = _db.Set<Book>()
@@ -89,10 +90,15 @@ namespace CoursesApplication.Web.Controllers
             ViewBag.CategoryOptions = await BuildCategoryOptionsAsync();
 
             var books = await query.ToListAsync();
+
+            if (!(User?.Identity?.IsAuthenticated ?? false))
+            {
+                return View("IndexAjax", books.OrderBy(b => b.Title).ToList());
+            }
             return View(books);
         }
 
-
+       
         public IActionResult Details(Guid? id)
         {
             var book = _db.Books
